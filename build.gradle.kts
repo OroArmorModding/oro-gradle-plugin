@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.oroarmor"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -14,6 +14,10 @@ repositories {
     maven {
         name = "Gradle Plugin Portal"
         url = uri("https://plugins.gradle.org/m2")
+    }
+    maven {
+        name = "Quilt Maven"
+        url = uri("https://maven.quiltmc.org/repository/release")
     }
 }
 
@@ -35,13 +39,13 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("gradle.plugin.org.cadixdev.gradle:licenser:0.6.1")
+    implementation("org.quiltmc:quilt-gradle-licenser:1.1.2" )
     implementation("org.kohsuke:github-api:1.301")
     implementation("net.dumbcode.gradlehook:GradleHook:1.3.1")
 
     implementation("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
 
-    implementation("gradle.plugin.com.modrinth.minotaur:Minotaur:1.1.0")
+    implementation("com.modrinth.minotaur:Minotaur:2.6.0")
     implementation("gradle.plugin.com.matthewprenger:CurseGradle:1.4.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")

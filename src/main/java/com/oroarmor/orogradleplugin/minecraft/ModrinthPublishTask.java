@@ -26,7 +26,6 @@ package com.oroarmor.orogradleplugin.minecraft;
 
 import com.modrinth.minotaur.TaskModrinthUpload;
 import com.oroarmor.orogradleplugin.GenericExtension;
-import com.oroarmor.orogradleplugin.publish.PublishProjectExtension;
 import com.oroarmor.orogradleplugin.publish.PublishProjectToLocationTask;
 import org.gradle.api.tasks.Internal;
 
@@ -38,21 +37,6 @@ public class ModrinthPublishTask extends TaskModrinthUpload implements PublishPr
         this.setGroup("publishProject");
 
         this.onlyIf(_unused -> System.getenv("MODRINTH_TOKEN") != null);
-
-        MinecraftPublishingExtension extension = getProject().getExtensions().getByType(MinecraftPublishingExtension.class);
-
-        this.token = System.getenv("MODRINTH_TOKEN");
-        this.projectId = extension.getModrinthId().get();
-        this.versionNumber = getProject().getVersion().toString();
-        uploadFile = extension.getModTask().get();
-        this.dependsOn(extension.getModTask().get());
-
-        extension.getVersions().get().forEach(this::addGameVersion);
-        this.addLoader(extension.getLoader().get().toLowerCase());
-
-        this.changelog = getProject().getExtensions().getByType(PublishProjectExtension.class).getChangelog().get();
-
-        this.versionName = getProject().getExtensions().getByType(GenericExtension.class).getName().get() + " - " + versionNumber;
 
         this.doLast(task -> {
             ModrinthPublishTask publishTask = ((ModrinthPublishTask) task);

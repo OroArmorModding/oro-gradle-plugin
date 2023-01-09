@@ -24,10 +24,12 @@
 
 package com.oroarmor.orogradleplugin.minecraft;
 
+import com.modrinth.minotaur.ModrinthExtension;
+import com.oroarmor.orogradleplugin.GenericExtension;
+import com.oroarmor.orogradleplugin.publish.PublishProjectExtension;
 import org.gradle.api.Project;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.AbstractCopyTask;
 import org.gradle.jvm.tasks.Jar;
 
 public class MinecraftPublishingExtension {
@@ -44,6 +46,19 @@ public class MinecraftPublishingExtension {
         loader = target.getObjects().property(String.class);
 
         modTask = target.getObjects().property(Jar.class);
+
+
+        target.getExtensions().configure(ModrinthExtension.class, conf -> {
+            conf.getToken().set(System.getenv("MODRINTH_TOKEN"));
+            conf.getProjectId().set(modrinthId.get());
+            conf.getVersionNumber().set(target.getVersion().toString());
+            conf.getUploadFile().set(modTask.get());
+            this.getVersions().get().forEach(v -> conf.getGameVersions().add(v));
+            conf.getLoaders().add(this.getLoader().get());
+            conf.getChangelog().set(target.getExtensions().getByType(PublishProjectExtension.class).getChangelog().get());
+            conf.getVersionName().set(target.getExtensions().getByType(GenericExtension.class).getName().get() + " - " + conf.getVersionNumber().get());
+        });
+
     }
 
     public ListProperty<String> getVersions() {
