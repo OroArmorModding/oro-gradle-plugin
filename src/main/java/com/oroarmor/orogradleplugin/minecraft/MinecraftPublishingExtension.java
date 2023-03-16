@@ -64,10 +64,10 @@ public class MinecraftPublishingExtension {
         target.getExtensions().configure(ModrinthExtension.class, conf -> {
             conf.getToken().set(System.getenv("MODRINTH_TOKEN"));
             conf.getProjectId().set(modrinthId);
-            conf.getVersionNumber().set(target.getVersion().toString());
             conf.getUploadFile().set(modTask);
             conf.getGameVersions().set(gameVersions);
             target.afterEvaluate(project -> {
+                conf.getVersionNumber().set(target.getVersion().toString());
                 conf.getLoaders().addAll(loaders.get().stream().map(String::toLowerCase).toList());
                 conf.getDependencies().set(
                         dependencies.stream().map(ModDependency::toModrinthDependency).toList()
