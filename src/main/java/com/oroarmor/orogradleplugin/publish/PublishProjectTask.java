@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,17 +110,17 @@ public class PublishProjectTask extends DefaultTask {
     }
 
     private static String formatName(String name) {
-        String formatted = "";
+        StringBuilder formatted = new StringBuilder();
         int lastIndex = 0;
         for(int i = 1; i < name.length(); i++) {
             if (Character.isUpperCase(name.charAt(i))) {
-                formatted += Character.toUpperCase(name.charAt(lastIndex)) + name.substring(lastIndex + 1, i) + " ";
+                formatted.append(Character.toUpperCase(name.charAt(lastIndex))).append(name, lastIndex + 1, i).append(" ");
                 lastIndex = i;
             }
         }
 
-        formatted += Character.toUpperCase(name.charAt(lastIndex)) + name.substring(lastIndex + 1);
+        formatted.append(Character.toUpperCase(name.charAt(lastIndex))).append(name.substring(lastIndex + 1));
 
-        return formatted.trim();
+        return formatted.toString().trim();
     }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@ package com.oroarmor.orogradleplugin.minecraft;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 
 import com.matthewprenger.cursegradle.CurseArtifact;
 import com.matthewprenger.cursegradle.CurseRelation;
@@ -63,14 +62,23 @@ public abstract class CurseforgePublishTask extends CurseUploadTask implements P
         artifact.setChangelogType("text");
         artifact.setReleaseType("release");
         artifact.setGameVersionStrings(new ArrayList<>());
-        extension.getVersions().get().forEach(artifact.getGameVersionStrings()::add);
-        artifact.getGameVersionStrings().add(extension.getLoader().get());
+        extension.getGameVersions().get().forEach(artifact.getGameVersionStrings()::add);
+        extension.getLoaders().get().forEach(artifact.getGameVersionStrings()::add);
         artifact.setArtifact(extension.getModTask().get());
         this.dependsOn(extension.getModTask().get());
 
-        if (!extension.getDependencies().get().isEmpty()) {
+        if (!extension.getDependencies().isEmpty()) {
             CurseRelation curseRelations = new CurseRelation();
-            extension.getDependencies().get().forEach(curseRelations::requiredDependency);
+            extension.getDependencies().all(modDependency -> {
+                switch (modDependency.getType()) {
+                    case REQUIRED -> curseRelations.requiredDependency(modDependency.getName());
+                    case OPTIONAL -> curseRelations.optionalDependency(modDependency.getName());
+                    case INCOMPATIBLE -> curseRelations.incompatible(modDependency.getName());
+                    case EMBEDDED -> curseRelations.embeddedLibrary(modDependency.getName());
+                    case TOOL -> curseRelations.tool(modDependency.getName());
+                }
+            });
+
             artifact.setCurseRelations(curseRelations);
         }
 

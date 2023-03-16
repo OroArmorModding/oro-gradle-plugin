@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,47 +25,64 @@
 package com.oroarmor.orogradleplugin.minecraft;
 
 import com.modrinth.minotaur.ModrinthExtension;
+import com.modrinth.minotaur.TaskModrinthSyncBody;
 import com.oroarmor.orogradleplugin.GenericExtension;
+import com.oroarmor.orogradleplugin.minecraft.dependency.ModDependency;
 import com.oroarmor.orogradleplugin.publish.PublishProjectExtension;
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.jvm.tasks.Jar;
 
 public class MinecraftPublishingExtension {
-    private final ListProperty<String> versions, dependencies;
-    private final Property<String> modrinthId, curseforgeId, loader;
+    private final ListProperty<String> gameVersions, loaders;
+    private final Property<String> modrinthId, curseforgeId;
     private final Property<Jar> modTask;
+    private final NamedDomainObjectContainer<ModDependency> dependencies;
 
     public MinecraftPublishingExtension(Project target) {
-        versions = target.getObjects().listProperty(String.class);
-        dependencies = target.getObjects().listProperty(String.class);
+        gameVersions = target.getObjects().listProperty(String.class);
+        dependencies = target.getObjects().domainObjectContainer(ModDependency.class, ModDependency::new);
 
         modrinthId = target.getObjects().property(String.class);
         curseforgeId = target.getObjects().property(String.class);
-        loader = target.getObjects().property(String.class);
+        loaders = target.getObjects().listProperty(String.class);
 
         modTask = target.getObjects().property(Jar.class);
 
+        // From Minotaur.java
+        target.getExtensions().create("modrinth", ModrinthExtension.class, target);
+        target.getLogger().debug("Created the `modrinth` extension.");
+        target.getTasks().register("modrinthSyncBody", TaskModrinthSyncBody.class, task -> {
+            task.setGroup("publishing");
+            task.setDescription("Sync project description to Modrinth");
+        });
+        target.getLogger().debug("Registered the `modrinthSyncBody` task.");
+        // End From Minotaur.java
 
         target.getExtensions().configure(ModrinthExtension.class, conf -> {
             conf.getToken().set(System.getenv("MODRINTH_TOKEN"));
-            conf.getProjectId().set(modrinthId.get());
+            conf.getProjectId().set(modrinthId);
             conf.getVersionNumber().set(target.getVersion().toString());
-            conf.getUploadFile().set(modTask.get());
-            this.getVersions().get().forEach(v -> conf.getGameVersions().add(v));
-            conf.getLoaders().add(this.getLoader().get());
-            conf.getChangelog().set(target.getExtensions().getByType(PublishProjectExtension.class).getChangelog().get());
-            conf.getVersionName().set(target.getExtensions().getByType(GenericExtension.class).getName().get() + " - " + conf.getVersionNumber().get());
+            conf.getUploadFile().set(modTask);
+            conf.getGameVersions().set(gameVersions);
+            conf.getLoaders().addAll(loaders);
+            target.afterEvaluate(project -> {
+                conf.getDependencies().set(
+                        dependencies.stream().map(ModDependency::toModrinthDependency).toList()
+                );
+                conf.getChangelog().set(project.getExtensions().getByType(PublishProjectExtension.class).getChangelog());
+                conf.getVersionName().set(project.getExtensions().getByType(GenericExtension.class).getName().get() + " - " + conf.getVersionNumber().get());
+            });
         });
-
     }
 
-    public ListProperty<String> getVersions() {
-        return versions;
+    public ListProperty<String> getGameVersions() {
+        return gameVersions;
     }
 
-    public ListProperty<String> getDependencies() {
+    public NamedDomainObjectContainer<ModDependency> getDependencies() {
         return dependencies;
     }
 
@@ -77,8 +94,8 @@ public class MinecraftPublishingExtension {
         return curseforgeId;
     }
 
-    public Property<String> getLoader() {
-        return loader;
+    public ListProperty<String> getLoaders() {
+        return loaders;
     }
 
     public Property<Jar> getModTask() {
