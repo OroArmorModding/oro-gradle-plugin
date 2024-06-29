@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.oroarmor"
-version = "1.2.3" + (if (System.getenv("GITHUB_RUN_NUMBER") != null) "" else "-local")
+version = "1.3.0" + (if (System.getenv("GITHUB_RUN_NUMBER") != null) "" else "-local")
 
 repositories {
     mavenCentral()
@@ -39,13 +39,13 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("org.quiltmc:quilt-gradle-licenser:1.1.2" )
-    implementation("org.kohsuke:github-api:1.301")
-    implementation("net.dumbcode.gradlehook:GradleHook:1.3.1")
+    implementation("dev.yumi:yumi-gradle-licenser:1.2.0")
+    implementation("org.kohsuke:github-api:1.322")
+    implementation("net.dumbcode.gradlehook:GradleHook:2.0.2")
 
     implementation("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
 
-    implementation("com.modrinth.minotaur:Minotaur:2.6.0")
+    implementation("com.modrinth.minotaur:Minotaur:2.8.7")
     implementation("gradle.plugin.com.matthewprenger:CurseGradle:1.4.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")

@@ -29,7 +29,7 @@ import com.oroarmor.orogradleplugin.GenericExtension;
 import com.oroarmor.orogradleplugin.publish.PublishProjectToLocationTask;
 import org.gradle.api.tasks.Internal;
 
-public class ModrinthPublishTask extends TaskModrinthUpload implements PublishProjectToLocationTask {
+public abstract class ModrinthPublishTask extends TaskModrinthUpload implements PublishProjectToLocationTask {
     @Internal
     private String releaseURL;
 

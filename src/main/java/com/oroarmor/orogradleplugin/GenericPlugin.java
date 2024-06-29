@@ -26,12 +26,12 @@ package com.oroarmor.orogradleplugin;
 
 import com.oroarmor.orogradleplugin.publish.PublishProjectExtension;
 import com.oroarmor.orogradleplugin.publish.PublishProjectTask;
+import dev.yumi.gradle.licenser.YumiLicenserGradleExtension;
+import dev.yumi.gradle.licenser.YumiLicenserGradlePlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
-import org.quiltmc.gradle.licenser.QuiltLicenserGradlePlugin;
-import org.quiltmc.gradle.licenser.extension.QuiltLicenserGradleExtension;
 
 public class GenericPlugin implements Plugin<Project> {
     @Override
@@ -53,9 +53,9 @@ public class GenericPlugin implements Plugin<Project> {
 
         target.getExtensions().create("oroarmor", GenericExtension.class, target);
 
-        target.getPluginManager().apply(QuiltLicenserGradlePlugin.class);
+        target.getPluginManager().apply(YumiLicenserGradlePlugin.class);
 
-        target.getExtensions().configure(QuiltLicenserGradleExtension.class, licenseExtension -> licenseExtension.rule(target.file("LICENSE")));
+        target.getExtensions().configure(YumiLicenserGradleExtension.class, licenseExtension -> licenseExtension.rule(target.file("LICENSE")));
 
         target.getExtensions().create("projectPublishing", PublishProjectExtension.class, target);
         target.getTasks().register("publishProject", PublishProjectTask.class);
