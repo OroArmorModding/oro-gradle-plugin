@@ -66,6 +66,7 @@ public class MinecraftPublishingExtension {
             conf.getProjectId().set(modrinthId);
             conf.getUploadFile().set(modTask);
             conf.getGameVersions().set(gameVersions);
+            conf.getAutoAddDependsOn().set(false);
             target.afterEvaluate(project -> {
                 conf.getVersionNumber().set(target.getVersion().toString());
                 conf.getLoaders().addAll(loaders.get().stream().map(String::toLowerCase).toList());

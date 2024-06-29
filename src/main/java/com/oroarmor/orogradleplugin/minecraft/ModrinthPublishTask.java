@@ -37,6 +37,7 @@ public abstract class ModrinthPublishTask extends TaskModrinthUpload implements 
         this.setGroup("publishProject");
 
         this.onlyIf(_unused -> System.getenv("MODRINTH_TOKEN") != null);
+        this.dependsOn(getProject().getExtensions().getByType(MinecraftPublishingExtension.class).getModTask());
 
         this.doLast(task -> {
             ModrinthPublishTask publishTask = ((ModrinthPublishTask) task);
