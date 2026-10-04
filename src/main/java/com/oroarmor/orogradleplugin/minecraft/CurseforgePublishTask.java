@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,86 +24,60 @@
 
 package com.oroarmor.orogradleplugin.minecraft;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import com.matthewprenger.cursegradle.CurseArtifact;
-import com.matthewprenger.cursegradle.CurseRelation;
-import com.matthewprenger.cursegradle.CurseUploadTask;
 import com.oroarmor.orogradleplugin.GenericExtension;
 import com.oroarmor.orogradleplugin.publish.PublishProjectExtension;
 import com.oroarmor.orogradleplugin.publish.PublishProjectToLocationTask;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
+import net.darkhax.curseforgegradle.Constants;
+import net.darkhax.curseforgegradle.TaskPublishCurseForge;
 import org.gradle.api.tasks.Internal;
 
-public abstract class CurseforgePublishTask extends CurseUploadTask implements PublishProjectToLocationTask {
+public abstract class CurseforgePublishTask extends TaskPublishCurseForge implements PublishProjectToLocationTask {
     @Internal
     private String releaseURL;
-
-    @Input
-    protected final Property<String> artifactName;
 
     public CurseforgePublishTask() {
         this.setGroup("publishProject");
 
-        artifactName = getProject().getObjects().property(String.class);
-        artifactName.convention(getProject().getExtensions().getByType(GenericExtension.class).getName().get() + " - " + getProject().getVersion());
-
         this.onlyIf(_unused -> System.getenv("CURSE_API_KEY") != null);
 
-        this.setApiKey(System.getenv("CURSE_API_KEY"));
-        CurseArtifact artifact = new CurseArtifact();
+        this.apiToken = System.getenv("CURSE_API_KEY");
 
         MinecraftPublishingExtension extension = getProject().getExtensions().getByType(MinecraftPublishingExtension.class);
+        this.upload(extension.getCurseforgeId().get(), extension.getModTask().get(), artifact -> {
+            artifact.changelog = getProject().getExtensions().getByType(PublishProjectExtension.class).getChangelog().get();
+            artifact.changelogType = Constants.CHANGELOG_MARKDOWN;
 
-        artifact.setChangelog(getProject().getExtensions().getByType(PublishProjectExtension.class).getChangelog().get());
+            artifact.displayName = getProject().getExtensions().getByType(GenericExtension.class).getName().get() + " - " + getProject().getVersion();
 
-        artifact.setChangelogType("text");
-        artifact.setReleaseType("release");
-        artifact.setGameVersionStrings(new ArrayList<>());
-        extension.getGameVersions().get().forEach(artifact.getGameVersionStrings()::add);
-        extension.getLoaders().get().forEach(artifact.getGameVersionStrings()::add);
-        artifact.setArtifact(extension.getModTask().get());
-        this.dependsOn(extension.getModTask().get());
+            artifact.releaseType = switch (extension.getReleaseType().get()) {
+                case RELEASE -> "release";
+                case BETA -> "beta";
+                case ALPHA -> "alpha";
+            };
 
-        if (!extension.getDependencies().isEmpty()) {
-            CurseRelation curseRelations = new CurseRelation();
+            artifact.addModLoader(extension.getLoaders().get().toArray());
+
             extension.getDependencies().all(modDependency -> {
                 switch (modDependency.getType()) {
-                    case REQUIRED -> curseRelations.requiredDependency(modDependency.getName());
-                    case OPTIONAL -> curseRelations.optionalDependency(modDependency.getName());
-                    case INCOMPATIBLE -> curseRelations.incompatible(modDependency.getName());
-                    case EMBEDDED -> curseRelations.embeddedLibrary(modDependency.getName());
-                    case TOOL -> curseRelations.tool(modDependency.getName());
+                    case REQUIRED -> artifact.addRequirement(modDependency.getName());
+                    case OPTIONAL -> artifact.addOptional(modDependency.getName());
+                    case INCOMPATIBLE -> artifact.addIncompatibility(modDependency.getName());
+                    case EMBEDDED -> artifact.addEmbedded(modDependency.getName());
+                    case TOOL -> artifact.addTool(modDependency.getName());
                 }
             });
+        });
 
-            artifact.setCurseRelations(curseRelations);
-        }
-
-        this.setAdditionalArtifacts(Collections.emptyList());
-        this.setMainArtifact(artifact);
-        this.setProjectId(extension.getCurseforgeId().get());
+        this.dependsOn(extension.getModTask().get());
 
         this.doLast(task -> {
             CurseforgePublishTask curseforgeTask = ((CurseforgePublishTask) task);
-            releaseURL = "https://www.curseforge.com/minecraft/mc-mods/" + getProject().getExtensions().getByType(GenericExtension.class).getName().get().toLowerCase() + "/files/" + curseforgeTask.getMainArtifact().getFileID();
+            releaseURL = "https://www.curseforge.com/minecraft/mc-mods/" + getProject().getExtensions().getByType(GenericExtension.class).getName().get().toLowerCase() + "/files/" + curseforgeTask.getUploadArtifacts().getFirst().getCurseFileId();
         });
-    }
-
-    @Override
-    public Object run() {
-        this.getMainArtifact().setDisplayName(this.artifactName.get());
-        return super.run();
     }
 
     @Override
     public String getReleaseURL() {
         return releaseURL;
-    }
-
-    public Property<String> getArtifactName() {
-        return artifactName;
     }
 }

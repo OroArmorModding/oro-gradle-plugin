@@ -2,11 +2,11 @@ plugins {
     java
     `java-gradle-plugin`
     `maven-publish`
-    id("org.cadixdev.licenser") version "0.6.1"
+    id("dev.yumi.gradle.licenser") version "4.0.+"
 }
 
 group = "com.oroarmor"
-version = "1.3.1" + (if (System.getenv("GITHUB_RUN_NUMBER") != null) "" else "-local")
+version = "1.4.0" + (if (System.getenv("GITHUB_RUN_NUMBER") != null) "" else "-local")
 
 repositories {
     mavenCentral()
@@ -39,14 +39,14 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("dev.yumi:yumi-gradle-licenser:1.2.0")
-    implementation("org.kohsuke:github-api:1.322")
+    implementation("dev.yumi:yumi-gradle-licenser:4.0.0")
+    implementation("org.kohsuke:github-api:1.330")
     implementation("net.dumbcode.gradlehook:GradleHook:2.0.2")
 
-    implementation("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0")
+    implementation("io.github.gradle-nexus:publish-plugin:2.0.0")
 
-    implementation("com.modrinth.minotaur:Minotaur:2.8.7")
-    implementation("gradle.plugin.com.matthewprenger:CurseGradle:1.4.0")
+    implementation("com.modrinth.minotaur:Minotaur:2.10.0")
+    implementation("net.darkhax.curseforgegradle:net.darkhax.curseforgegradle.gradle.plugin:1.3.33")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -57,7 +57,7 @@ tasks.getByName<Test>("test") {
 }
 
 license {
-    setHeader(project.file("LICENSE"))
+    rule(project.file("LICENSE"))
 }
 
 publishing {

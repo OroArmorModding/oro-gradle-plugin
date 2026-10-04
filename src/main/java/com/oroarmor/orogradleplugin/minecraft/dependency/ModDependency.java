@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,14 @@ package com.oroarmor.orogradleplugin.minecraft.dependency;
 import com.modrinth.minotaur.dependencies.Dependency;
 import org.gradle.api.Named;
 import org.gradle.api.tasks.Input;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
 public class ModDependency implements Named, Serializable {
     @Input
+    @NotNull
     private final String id;
     @Input
     private @Nullable String version;
@@ -43,11 +45,11 @@ public class ModDependency implements Named, Serializable {
         this.id = id;
     }
 
-    public String getVersion() {
+    public @Nullable String getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(@Nullable String version) {
         this.version = version;
     }
 
@@ -60,7 +62,7 @@ public class ModDependency implements Named, Serializable {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return id;
     }
 

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ public class MinecraftPublishingExtension {
     private final Property<String> modrinthId, curseforgeId;
     private final Property<Jar> modTask;
     private final NamedDomainObjectContainer<ModDependency> dependencies;
+    private final Property<ReleaseType> releaseType;
 
     public MinecraftPublishingExtension(Project target) {
         gameVersions = target.getObjects().listProperty(String.class);
@@ -50,6 +51,8 @@ public class MinecraftPublishingExtension {
         loaders = target.getObjects().listProperty(String.class);
 
         modTask = target.getObjects().property(Jar.class);
+
+        releaseType = target.getObjects().property(ReleaseType.class);
 
         // From Minotaur.java
         target.getExtensions().create("modrinth", ModrinthExtension.class, target);
@@ -68,6 +71,11 @@ public class MinecraftPublishingExtension {
             conf.getGameVersions().set(gameVersions);
             conf.getAutoAddDependsOn().set(false);
             target.afterEvaluate(project -> {
+                conf.getVersionType().set(switch (releaseType.get()) {
+                    case RELEASE -> "release";
+                    case BETA -> "beta";
+                    case ALPHA -> "alpha";
+                });
                 conf.getVersionNumber().set(target.getVersion().toString());
                 conf.getLoaders().addAll(loaders.get().stream().map(String::toLowerCase).toList());
                 conf.getDependencies().set(
@@ -101,5 +109,9 @@ public class MinecraftPublishingExtension {
 
     public Property<Jar> getModTask() {
         return modTask;
+    }
+
+    public Property<ReleaseType> getReleaseType() {
+        return releaseType;
     }
 }

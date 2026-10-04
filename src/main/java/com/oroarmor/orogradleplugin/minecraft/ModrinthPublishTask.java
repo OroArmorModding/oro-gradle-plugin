@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,8 @@ public abstract class ModrinthPublishTask extends TaskModrinthUpload implements 
         this.doLast(task -> {
             ModrinthPublishTask publishTask = ((ModrinthPublishTask) task);
 
-            if (publishTask.wasUploadSuccessful()) {
-                publishTask.releaseURL = "https://modrinth.com/mod/" + getProject().getExtensions().getByType(GenericExtension.class).getName().get().toLowerCase() + "/version/" + publishTask.uploadInfo.getId();
+            if (publishTask.newVersion != null) {
+                publishTask.releaseURL = "https://modrinth.com/mod/" + getProject().getExtensions().getByType(GenericExtension.class).getName().get().toLowerCase() + "/version/" + publishTask.newVersion.getId();
             }
         });
     }

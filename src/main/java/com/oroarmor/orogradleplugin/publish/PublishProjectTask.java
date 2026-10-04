@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -98,8 +98,7 @@ public class PublishProjectTask extends DefaultTask {
                                 }
                             }
 
-                            System.out.println(downloadsString.length());
-                            downloads.setValue(downloadsString.length() == 0 ? "No downloads detected" : downloadsString.toString());
+                            downloads.setValue(downloadsString.isEmpty() ? "No downloads detected" : downloadsString.toString());
 
                             embed.setFields(List.of(changes, downloads));
                         }

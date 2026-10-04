@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ package com.oroarmor.orogradleplugin.maven;
 
 import java.util.Map;
 
-import io.codearte.gradle.nexus.NexusStagingExtension;
-import io.codearte.gradle.nexus.NexusStagingPlugin;
+import io.github.gradlenexus.publishplugin.NexusPublishExtension;
+import io.github.gradlenexus.publishplugin.NexusPublishPlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.publish.PublishingExtension;
@@ -66,9 +66,10 @@ public class MavenCentralPlugin implements Plugin<Project> {
             target.getExtensions().getByType(PublishingExtension.class).getPublications().all(signingExtension::sign);
         }
 
-        target.getPluginManager().apply(NexusStagingPlugin.class);
-        NexusStagingExtension stagingExtension = target.getExtensions().getByType(NexusStagingExtension.class);
-        stagingExtension.setUsername("OroArmor");
-        stagingExtension.setPassword(((Map<String, String>) target.getProperties()).getOrDefault("ossrhPassword", System.getenv("OSSRH_PASSWORD")));
+//        TODO: Seems like a lot changed with central publishing. Fix this when I need it.
+//        target.getPluginManager().apply(NexusPublishPlugin.class);
+//        NexusPublishExtension stagingExtension = target.getExtensions().getByType(NexusPublishExtension.class);
+//        stagingExtension.setUsername("OroArmor");
+//        stagingExtension.setPassword(((Map<String, String>) target.getProperties()).getOrDefault("ossrhPassword", System.getenv("OSSRH_PASSWORD")));
     }
 }

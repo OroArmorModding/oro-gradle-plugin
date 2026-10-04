@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 - 2023 OroArmor (Eli Orona)
+ * Copyright (c) 2021 - 2026 OroArmor (Eli Orona)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 
 package com.oroarmor.orogradleplugin.minecraft;
 
-import com.matthewprenger.cursegradle.CurseExtension;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -32,7 +31,5 @@ public abstract class MinecraftPlugin implements Plugin<Project> {
     @Override
     public void apply(Project target) {
         target.getExtensions().create("minecraftPublishing", MinecraftPublishingExtension.class, target);
-
-        target.getExtensions().create("curseforge", CurseExtension.class);
     }
 }
