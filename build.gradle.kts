@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.oroarmor"
-version = "1.4.0" + (if (System.getenv("GITHUB_RUN_NUMBER") != null) "" else "-local")
+version = "1.4.1" + (if (System.getenv("GITHUB_RUN_NUMBER") != null) "" else "-local")
 
 repositories {
     mavenCentral()

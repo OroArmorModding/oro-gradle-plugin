@@ -56,6 +56,7 @@ public abstract class CurseforgePublishTask extends TaskPublishCurseForge implem
             };
 
             artifact.addModLoader(extension.getLoaders().get().toArray());
+            artifact.addGameVersion(extension.getGameVersions().get().toArray());
 
             extension.getDependencies().all(modDependency -> {
                 switch (modDependency.getType()) {
