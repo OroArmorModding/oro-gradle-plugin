@@ -58,7 +58,6 @@ public class PublishProjectToGithubTask extends DefaultTask implements PublishPr
         GHReleaseBuilder releaseBuilder = new GHReleaseBuilder(repository, getProject().getVersion().toString());
         releaseBuilder.name(extension.getName().get() + " " + getProject().getVersion());
         releaseBuilder.body(getProject().getExtensions().getByType(PublishProjectExtension.class).getChangelog().get());
-        releaseBuilder.commitish("master");
 
         GHRelease release = releaseBuilder.create();
         assets.forEach(file -> {
